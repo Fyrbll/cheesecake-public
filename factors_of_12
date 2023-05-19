@@ -1,0 +1,13 @@
+(define-fun is-Pos ((v Value)) Bool
+  (and (is-int v) (> (unint v) 0)))
+
+(define-fun is-FactorsConstr ((v Value)) Bool
+  (and (is-Pos v) (= (mod 12 (unint v)) 0)))
+
+(define-fun is-FactorsEnum ((v Value)) Bool
+  (and (is-Pos v)
+       (or (= (unint v) 1) (= (unint v) 2) (= (unint v) 3)
+           (= (unint v) 4) (= (unint v) 6) (= (unint v) 12))))
+
+(prove (forall ((v Value))
+  (=> (is-FactorsConstr v) (is-FactorsEnum v))))

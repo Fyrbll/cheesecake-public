@@ -1,0 +1,17 @@
+(define-fun is-Pos ((v Value)) Bool
+  (and (is-int v) (> (unint v) 0)))
+
+(prove (forall ((v Value))
+   (=> (and (is-cons v)
+           (is-Pos (car v))
+           (is-cons (cdr v))
+           (is-Pos (car (cdr v)))
+           (is-cons (cdr (cdr v)))
+           (is-Pos (car (cdr (cdr v))))
+           (is-Pos (cdr (cdr (cdr v))))
+           (= (+ (unint (car v))
+                 (unint (car (cdr v)))
+                 (unint (car (cdr (cdr v))))
+                 (unint (cdr (cdr (cdr v)))))
+              3))
+      false)))

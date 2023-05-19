@@ -1,0 +1,47 @@
+(define-fun-rec is-List1Any ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-List1Any (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-MuNat ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-MuNat (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec length ((v Value)) Value
+  (ite (is-nil v)  nil
+  (ite (is-cons v) (cons nil (length (cdr v)))
+                   nil))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec append ((v Value) (w Value)) Value 
+  (ite (and (is-List1Any v) (is-List1Any w))
+       (ite (is-nil v)  w
+       (ite (is-cons v) (cons (car v) (append (cdr v) w))
+                        nil))
+       nil)
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec plus ((v Value) (w Value)) Value
+  (ite (and (is-MuNat v) (is-MuNat w))
+       (ite (is-nil v)  w
+       (ite (is-cons v) (cons nil (plus (cdr v) w))
+                        nil))
+       nil)
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (and (is-cons v)
+           (is-List1Any (car v))
+           (is-List1Any (cdr v))
+           (not (= (length (append (car v) (cdr v)))
+                   (plus (length (car v)) (length (cdr v))))))
+      false)))

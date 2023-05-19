@@ -1,0 +1,2 @@
+(prove (forall ((v Value))
+  (=> (and (is-int v) (= (* 5 (unint v)) 7)) false)))

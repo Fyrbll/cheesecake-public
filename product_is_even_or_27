@@ -1,0 +1,27 @@
+(define-fun is-TwoToFour ((v Value)) Bool
+  (and (is-int v) (<= 2 (unint v)) (<= (unint v) 4)))
+
+(define-fun is-Triple ((v Value)) Bool
+  (and (is-cons v)
+       (is-TwoToFour (car v))
+       (is-cons (cdr v))
+       (is-TwoToFour (car (cdr v)))
+       (is-TwoToFour (cdr (cdr v)))))
+
+(define-fun is-ProdEven ((v Value)) Bool
+  (and (is-Triple v)
+       (= (mod (* (unint (car v))
+                  (unint (car (cdr v)))
+                  (unint (cdr (cdr v))))
+               2)
+          0)))
+
+(define-fun is-Prod27 ((v Value)) Bool
+  (and (is-Triple v)
+       (= (* (unint (car v))
+             (unint (car (cdr v)))
+             (unint (cdr (cdr v))))
+          27)))
+
+(prove (forall ((v Value))
+  (=> (is-Triple v) (or (is-ProdEven v) (is-Prod27 v)))))

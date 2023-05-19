@@ -1,0 +1,7 @@
+(prove (forall ((v Value))
+  (=> (and (is-int v)
+           (> (* (- 1 (unint v)) (- (unint v) 3)
+                 (- (unint v) 5) (- (unint v) 7))
+              0))
+      (and (is-int v)
+           (or (= (unint v) 2) (= (unint v) 6))))))

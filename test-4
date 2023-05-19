@@ -1,0 +1,34 @@
+(define-fun null ((v Value)) Bool
+  (is-nil v))
+
+(define-fun consp ((v Value)) Bool
+  (is-cons v))
+
+(define-fun integerp ((v Value)) Bool
+  (is-int v))
+
+(define-fun natp ((v Value)) Bool
+  (and (integerp v)
+       (>= (unint v) 0)))
+
+(define-fun-rec listap ((v Value)) Bool
+  (or (null v)
+      (and (consp v)
+           (listap (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec listbp ((v Value)) Bool
+  (or (null v)
+      (and (consp v)
+           (listbp (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (and (consp v)
+           (natp (car v))
+           (listap (cdr v)))
+      (and (consp v)
+           (integerp (car v))
+           (listbp (cdr v))))))

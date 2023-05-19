@@ -1,0 +1,47 @@
+;; From https://github.com/tip-org/benchmarks/blob/master/benchmarks/prod/lemma_13.smt2
+
+(define-fun-rec is-Nat ((x Value)) Bool
+  (or (is-nil x)
+      (and (is-cons x)
+	   (is-nil (car x))
+	   (is-Nat (cdr x))))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun mk-Z ((x Value)) Value nil)
+(define-fun mk-S ((x Value)) Value (ite (is-Nat x) (cons nil x) nil))
+
+(define-fun un-S ((x Value)) Value
+  (ite (and (is-Nat x) (is-cons x)) (cdr x) nil))
+
+(define-fun is-Z ((x Value)) Bool
+  (is-nil x))
+
+(define-fun is-S ((x Value)) Bool
+  (and (is-Nat x) (is-cons x)))
+
+(define-fun-rec is-list ((x Value)) Bool
+  (or (is-nil x)
+      (and (is-cons x)
+           (is-list (cdr x))))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+
+(define-fun-rec ++ ((x Value) (y Value))
+  Value
+  (ite (is-nil x) y (ite (is-cons x) (cons (car x) (++ (cdr x) y)) nil))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec len ((x Value))
+  Value
+  (ite (is-list x) (ite (is-nil x) (mk-Z nil) (ite (is-cons x) (mk-S (len (cdr x))) nil)) nil)
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(prove
+ (forall ((x Value) (y Value) (z Value))
+	 (=> (and (is-list x) (is-list y))
+	     (= (++ (++ x y) (cons z nil))
+		(++ x (++ y (cons z nil)))))))

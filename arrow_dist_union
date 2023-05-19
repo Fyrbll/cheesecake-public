@@ -1,0 +1,44 @@
+(define-fun is-Zero ((v Value)) Bool
+  (and (is-int v) (= (unint v) 0)))
+
+(define-fun is-One ((v Value)) Bool
+  (and (is-int v) (= (unint v) 1)))
+
+(define-fun is-Two ((v Value)) Bool
+  (and (is-int v) (= (unint v) 2)))
+
+(define-fun-rec is-Zero->Two ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-Zero (car (car v)))
+               (is-Two (cdr (car v))))
+           (is-Zero->Two (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-One->Two ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-One (car (car v)))
+               (is-Two (cdr (car v))))
+           (is-One->Two (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-ZeroOne->Two ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (or (is-Zero (car (car v)))
+                   (is-One (car (car v))))
+               (is-Two (cdr (car v))))
+           (is-ZeroOne->Two (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (and (is-Zero->Two v)
+           (is-One->Two v))
+      (is-ZeroOne->Two v))))

@@ -1,0 +1,58 @@
+(define-fun consp ((v Value)) Bool
+  (is-cons v))
+
+(define-fun null ((v Value)) Bool
+  (is-nil v))
+
+(define-fun intp ((v Value)) Bool
+  (is-int v))
+
+(define-fun-rec is-tree-forest-a ((flag Bool) (v Value)) Bool
+  (ite flag
+       (or (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 0)
+                (null (cdr v)))
+           (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 1)
+                (is-tree-forest-a false (cdr v))))
+       (or (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 2)
+                (null (cdr v)))
+           (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 3)
+                (consp (cdr v))
+                (is-tree-forest-a true (car (cdr v)))
+                (is-tree-forest-a false (cdr (cdr v))))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-tree-forest-b ((flag Bool) (v Value)) Bool
+  (ite flag
+       (or (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 0)
+                (null (cdr v)))
+           (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 1)
+                (is-tree-forest-b (not flag) (cdr v))))
+       (or (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 2)
+                (null (cdr v)))
+           (and (consp v)
+                (intp (car v))
+                (= (unint (car v)) 3)
+                (consp (cdr v))
+                (is-tree-forest-b (not flag) (car (cdr v)))
+                (is-tree-forest-b flag (cdr (cdr v))))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((b Bool) (v Value))
+  (=> (is-tree-forest-a b v)
+      (is-tree-forest-b b v))))

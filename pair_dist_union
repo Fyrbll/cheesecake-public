@@ -1,0 +1,20 @@
+(define-fun is-Zero ((v Value)) Bool
+  (and (is-int v) (= (unint v) 0)))
+
+(define-fun is-One ((v Value)) Bool
+  (and (is-int v) (= (unint v) 1)))
+
+(define-fun is-Two ((v Value)) Bool
+  (and (is-int v) (= (unint v) 2)))
+
+(prove (forall ((v Value))
+  (=> (and (is-cons v)
+           (is-Zero (car v))
+           (or (is-One (cdr v))
+               (is-Two (cdr v))))
+      (or (and (is-cons v)
+               (is-Zero (car v))
+               (is-One (cdr v)))
+          (and (is-cons v)
+               (is-Zero (car v))
+               (is-Two (cdr v)))))))

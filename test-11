@@ -1,0 +1,115 @@
+;; I do not intend to prove any goals here.
+;; I am just testing the termination checker.
+
+(define-fun consp ((v Value)) Bool
+  (is-cons v))
+
+(define-fun null ((v Value)) Bool
+  (is-nil v))
+
+(define-fun int-to-nat ((v Value)) Int
+  (ite (> (unint v) 0)
+       (unint v)
+       0))
+
+(define-fun-rec less-than ((v Value) (w Value)) Bool
+  (or (and (is-int v)
+           (is-int w)
+           (< (int-to-nat v) (int-to-nat w)))
+      (and (is-cons v)
+           (is-cons w)
+           (is-int (car v))
+           (is-int (car w))
+           (or (< (int-to-nat (car v)) (int-to-nat (car w)))
+               (and (= (int-to-nat (car v)) (int-to-nat (car w)))
+                    (less-than (cdr v) (cdr w))))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec ackermann-peter ((m Int) (n Int)) Int
+  (ite (> m 0)
+       (ite (> n 0)
+            (ackermann-peter (- m 1) (ackermann-peter m (- n 1)))
+            (ackermann-peter (- m 1) 1))
+       (+ n 1))
+  (:measure (cons (int m) (int n)))
+  (:relation (less-than x y)))
+
+(define-fun-rec is-natural ((v Value)) Bool
+  (or (and (is-cons v)
+           (is-nil (car v))
+           (is-natural (cdr v)))
+      (is-nil v))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec plus ((m Value) (n Value)) Value
+  (ite (is-nil m)
+       n
+       (ite (is-cons m)
+            (cons nil (plus n (cdr m)))
+            nil))
+  (:measure (+ (size m) (size n)))
+  (:relation (nat< x y)))
+
+(define-fun-rec minimum ((m Value) (n Value)) Value
+  (ite (is-nil m)
+       m
+       (ite (is-cons m)
+            (ite (is-nil n)
+                 n
+                 (ite (is-cons n)
+                      (cons nil (minimum (cdr m) (cdr n)))
+                      nil))
+            nil))
+  (:measure (size n))
+  (:relation (nat< x y)))
+
+(define-fun-rec gcd ((m Int) (n Int)) Int
+  (ite (and (> m 0) (> n 0))
+       (ite (= m n)
+            m
+            (ite (< m n)
+                 (gcd (- n m) m)
+                 (gcd (- m n) n)))
+       1)
+  (:measure (+ m n))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-ordered-list ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-int (car v))
+           (is-nil (cdr v)))
+      (and (is-cons v)
+           (is-int (car v))
+           (is-cons (cdr v))
+           (is-int (car (cdr v)))
+           (< (unint (car v)) (unint (car (cdr v))))
+           (is-ordered-list (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-bool-list ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-bool (car v))
+           (is-nil (cdr v)))
+      (and (is-cons v)
+           (is-bool (car v))
+           (is-cons (cdr v))
+           (is-bool (car (cdr v)))
+           (is-bool-list (cdr (cdr v)))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec make-list ((x Int) (m Int) (n Int)) Value
+  (ite (>= m 0)
+       (ite (< m n)
+            (cons (int x) (make-list x (+ m 1) n))
+            nil)
+       nil)
+  (:measure (ite (or (< m 0) (< n m))
+                 0
+                 (- n m)))
+  (:relation (nat< x y)))

@@ -1,0 +1,26 @@
+;; I do not intend to prove any goals here.
+;; I am just testing the termination checker.
+
+(define-fun-rec pred ((j Int) (z Int)) Bool
+  (> z 100)
+  (:measure 0)
+  (:relation true))
+
+(define-fun-rec fn ((z Int)) Int
+  (+ z 1)
+  (:measure 0)
+  (:relation true))
+
+(define-fun-rec whileloop ((i Int) (max Int) (x Int)) Bool
+  (and (< i max) (or (pred i x) (whileloop (+ 1 i) max (fn x))))
+  (:measure (ite (< (- max i) 0) 0 (- max i)))
+  (:relation (nat< x y)))
+
+(define-fun-rec always-zero ((i Int) (j Int)) Int
+  (ite (and (<= 1 i) (<= i j) (< j (+ i i i)))
+       (always-zero (- j i) (- j i))
+       (ite (and (<= 1 j) (<= j i) (< i (+ j j j)))
+            (always-zero (- i j) (- i j))
+            0))
+  (:measure (+ i j))
+  (:relation (nat< x y)))

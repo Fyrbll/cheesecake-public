@@ -1,0 +1,29 @@
+(define-fun-rec ++ ((x Value) (y Value)) Value
+  (ite (is-nil x)
+       y 
+       (ite (is-cons x)
+            (cons (car x) (++ (cdr x) y))
+            nil))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec rev ((x Value)) Value
+  (ite (is-nil x)
+       nil
+       (ite (is-cons x)
+            (++ (rev (cdr x)) (cons (car x) nil))
+            nil))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list ((x Value)) Bool
+  (or (is-nil x)
+      (and (is-cons x)
+           (is-list (cdr x))))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(prove (forall ((x Value) (y Value))
+   (=> (is-list x)
+       (= (rev (++ (++ x (cons y nil)) nil))
+          (cons y (rev (++ x nil)))))))

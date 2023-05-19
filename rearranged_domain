@@ -1,0 +1,54 @@
+(define-fun-rec is-List1Any ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-List1Any (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-Int->Bool ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-int (car (car v)))
+               (is-bool (cdr (car v))))
+           (is-Int->Bool (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-List1Any->Bool ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-List1Any (car (car v)))
+               (is-bool (cdr (car v))))
+           (is-List1Any->Bool (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-IntUNull->Bool ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (or (is-int (car (car v)))
+                   (is-nil (car (car v))))
+               (is-bool (cdr (car v))))
+           (is-IntUNull->Bool (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-AnyXList1Any->Bool ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (and (is-cons (car (car v)))
+                    (is-List1Any (cdr (car (car v)))))
+               (is-bool (cdr (car v))))
+           (is-AnyXList1Any->Bool (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (and (is-Int->Bool v)
+           (is-List1Any->Bool v))
+      (and (is-IntUNull->Bool v)
+           (is-AnyXList1Any->Bool v)))))

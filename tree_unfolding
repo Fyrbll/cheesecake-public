@@ -1,0 +1,20 @@
+(define-fun-rec is-Tree1Null ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (is-Tree1Null (car (car v)))
+           (is-Tree1Null (cdr (car v)))
+           (is-Tree1Null (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-Tree2Null ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-Tree2Null (car v))
+           (is-Tree2Null (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (is-Tree1Null v) (is-Tree2Null v))))

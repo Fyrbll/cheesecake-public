@@ -1,0 +1,29 @@
+(define-fun is-Nat ((v Value)) Bool
+  (and (is-int v) (>= (unint v) 0)))
+  
+(define-fun is-Even ((v Value)) Bool
+  (and (is-int v) (>= (unint v) 0) (= (mod (unint v) 2) 0)))
+
+(define-fun-rec is-Nat->Bool ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-Nat (car v))
+               (is-bool (cdr v)))
+           (is-Nat->Bool (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-Even->Bool ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-Even (car v))
+               (is-bool (cdr v)))
+           (is-Even->Bool (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (is-Nat->Bool v) 
+      (is-Even->Bool v))))

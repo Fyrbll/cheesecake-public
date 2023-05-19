@@ -1,0 +1,60 @@
+(define-fun-rec is-odd-even--a ((in-odd Bool) (v Value)) Bool
+  (ite in-odd
+       (and (is-cons v)
+            (is-nil (car v))
+            (is-odd-even--a false (cdr v)))
+       (or (is-nil v)
+           (and (is-cons v)
+                (is-nil (car v))
+                (is-odd-even--a true (cdr v)))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-odd-even--b ((in-odd Bool) (v Value)) Bool
+  (ite in-odd
+       (and (is-cons v)
+            (is-nil (car v))
+            (is-odd-even--b (not in-odd) (cdr v)))
+       (or (is-nil v)
+           (and (is-cons v)
+                (is-nil (car v))
+                (is-odd-even--b (not in-odd) (cdr v)))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-odd ((v Value)) Bool
+  (or (and (is-cons v)
+           (is-nil (car v))
+           (is-nil (cdr v)))
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-cons (cdr v))
+           (is-nil (car (cdr v)))
+           (is-odd (cdr (cdr v)))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-nat ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-nat (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+;;;; [provable]
+(prove (forall ((v Value))
+  (=> (is-odd v)
+      (is-odd-even--b true v))))
+
+;;;; [provable]
+;; (prove (forall ((v Value))
+;;   (=> (is-nat v)
+;;       (not (is-odd v))
+;;       (is-odd-even--a false v))))
+
+;;;; [provable]
+;; (prove (forall ((in-odd Bool) (v Value))
+;;   (=> (is-odd-even--b in-odd v)
+;;       (is-odd-even--a in-odd v))))
+

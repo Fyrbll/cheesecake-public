@@ -1,0 +1,84 @@
+(define-fun mk-Z ((x Value)) Value
+  nil)
+
+(define-fun mk-S ((x Value)) Value
+  (cons nil x))
+
+(define-fun un-S ((x Value)) Value
+  (ite (is-cons x)
+       (cdr x)
+       nil))
+
+(define-fun is-Z ((x Value)) Bool
+  (is-nil x))
+
+(define-fun is-S ((x Value)) Bool
+  (is-cons x))
+
+(define-fun-rec is-Nat ((x Value)) Bool
+  (or (is-nil x)
+      (and (is-cons x)
+	   (is-nil (car x))
+	   (is-Nat (cdr x))))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list ((x Value)) Bool
+  (or (is-nil x)
+      (and (is-cons x)
+           (is-list (cdr x))))
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec <=2 ((x Value) (y Value)) Bool
+  (ite (and (is-Nat x) (is-Nat y))
+       (ite (is-Z x)
+            true
+            (ite (is-Z y)
+                 false
+                 (<=2 (un-S x) (un-S y))))
+       false)
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec == ((x Value) (y Value)) Bool
+  (ite (and (is-Nat x) (is-Nat y))
+       (ite (is-Z x)
+            (ite (is-Z y)
+                 true
+                 false)
+            (ite (is-Z y)
+                 false
+                 (== (un-S x) (un-S y))))
+       false)
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+(define-fun-rec delete ((x Value) (y Value)) Value
+  (ite (and (is-Nat x) (is-list y))
+       (ite (is-nil y)
+            nil
+            (ite (is-cons y)
+                 (ite (== x (car y))
+                      (delete x (cdr y))
+                      (cons (car y) (delete x (cdr y))))
+                 nil))
+       nil)
+  (:measure (size y))
+  (:relation (nat< x y)))
+
+(define-fun-rec len ((x Value)) Value
+  (ite (is-list x)
+       (ite (is-nil x)
+            (mk-Z nil)
+            (ite (is-cons x)
+                 (mk-S (len (cdr x)))
+                 nil))
+       nil)
+  (:measure (size x))
+  (:relation (nat< x y)))
+
+;;;;; [not provable]
+(prove (forall ((n Value) (xs Value))
+  (=> (and (is-Nat n) (is-list xs))
+      (<=2 (len (delete n xs)) (len xs)))))

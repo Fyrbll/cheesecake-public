@@ -1,0 +1,1 @@
+("8.7.0.6" ta6osx ("2f9d04f3b85438a4e11e1f72154d5cce376aa3aa" . "04f5c15e45230d580d28084ba21ab0a8ba1ca0c8") (collects #"racket" #"base.rkt") (collects #"racket" #"runtime-config.rkt") (collects #"racket" #"syntax.rkt"))

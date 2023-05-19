@@ -1,0 +1,52 @@
+(define-fun null ((v Value)) Bool
+  (is-nil v))
+
+(define-fun consp ((v Value)) Bool
+  (is-cons v))
+
+(define-fun natp ((v Value)) Bool
+  (and (is-int v) (>= (unint_ v) 0)))
+
+(define-fun-rec sum ((v Value)) Value 
+  (ite (null v)                      (int 0)
+  (ite (consp v) (ite (natp (car v)) (int (+ (unint_ (car v)) (unint_ (sum (cdr v)))))
+                                     (sum (cdr v)))
+                                     (int 0)))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list-even ((v Value)) Bool
+  (or (null v)
+      (and (consp v)
+           (natp (car v))
+           (= (mod (unint_ (car v)) 2) 0)
+           (is-list-even (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list-sum-even ((v Value)) Bool
+  (or (null v)
+      (and (consp v)
+           (natp (car v))
+           (is-list-sum-even (cdr v))
+           (= (mod (+ (unint_ (car v)) (unint_ (sum (cdr v)))) 2) 0)))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list-nat ((v Value)) Bool
+  (or (null v)
+      (and (consp v)
+           (natp (car v))
+           (is-list-nat (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+;;;; [provable]
+;; (prove (forall ((x Value))
+;;   (=> (is-list-even x)
+;;       (is-list-sum-even x))))
+
+;;;; [provable]
+(prove (forall ((x Value))
+  (=> (is-list-sum-even x)
+      (is-list-even x))))

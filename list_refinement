@@ -1,0 +1,15 @@
+(define-fun-rec is-ListInt ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-int (car v))
+           (is-ListInt (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (and (is-ListInt v)
+           (not (is-nil v))
+           (= (unint (car v)) 0))
+      (and (is-cons v)
+           (is-int (car v))
+           (is-ListInt (cdr v))))))

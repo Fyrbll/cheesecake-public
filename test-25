@@ -1,0 +1,33 @@
+(define-fun null ((v Value)) Bool (is-nil v))
+(define-fun consp ((v Value)) Bool (is-cons v))
+(define-fun integerp ((v Value)) Bool (is-int v))
+
+(define-fun-rec is-list-pos ((v Value)) Bool
+  (or (null v)
+      (and (consp v)
+           (integerp (car v))
+           (= (unint (car v)) 1)
+           (is-list-pos (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec length ((v Value)) Value
+  (ite (null v)  (int 0)
+  (ite (consp v) (int (+ 1 (unint (length (cdr v)))))
+                 (int 0)))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec sum ((v Value)) Value
+  (ite (null v)                           (int 0)
+  (ite (and (consp v) (integerp (car v))) (int (+ (unint (car v)) (unint (sum (cdr v)))))
+  (ite (consp v)                          (sum (cdr v))
+                                          (int 0))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+;;;; [not provable]
+(prove (forall ((x Value)) 
+  (=> (and (is-list-pos x)
+           (= (unint (length x)) 7))
+      (= (unint (sum x)) 7))))

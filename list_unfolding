@@ -1,0 +1,19 @@
+(define-fun-rec is-List1Any ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-List1Any (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-List2Any ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (cdr v)))
+      (and (is-cons v)
+           (is-cons (cdr v))
+           (is-List2Any (cdr (cdr v)))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (is-List1Any v) (is-List2Any v))))

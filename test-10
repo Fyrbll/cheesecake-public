@@ -1,0 +1,35 @@
+(define-fun is-succ ((v Value)) Bool
+  (and (is-cons v) (is-nil (car v))))
+
+(define-fun is-zero ((v Value)) Bool
+  (is-nil v))
+
+(define-fun-rec is-natural ((v Value)) Bool
+  (or (is-zero v)
+      (and (is-succ v)
+           (is-natural (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+;; in-even = 0  <=>  we are in the 'odd' branch
+;; in-even = 1  <=>  we are in the 'even' branch
+(define-fun-rec is-odd-even ((in-even Int) (v Value)) Bool
+  (ite (= in-even 0)
+       (and (is-succ v)
+            (is-odd-even (+ in-even 1) (cdr v)))
+       (ite (= in-even 1)
+            (or (is-zero v)
+                (and (is-succ v)
+                     (is-odd-even (- in-even 1) (cdr v))))
+            false))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+;;;; [not provable]
+;; (prove (forall ((v Value))
+;;   (=> (is-odd-even 0 v)
+;;       (is-natural v))))
+
+(prove (forall ((in-even Int) (v Value))
+  (=> (is-odd-even in-even v)
+      (is-natural v))))

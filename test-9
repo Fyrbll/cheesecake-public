@@ -1,0 +1,41 @@
+(define-fun-rec is-nat ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-nat (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-even ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-cons (cdr v))
+           (is-nil (car (cdr v)))
+           (is-even (cdr (cdr v)))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-even_to_nat ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-even (car (car v)))
+               (is-nat (cdr (car v))))
+           (is-even_to_nat (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-nat_to_nat ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-cons (car v))
+           (=> (is-nat (car (car v)))
+               (is-nat (cdr (car v))))
+           (is-nat_to_nat (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (is-nat_to_nat v)
+      (is-even_to_nat v))))

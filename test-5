@@ -1,0 +1,34 @@
+(define-fun-rec is-natural-a ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-natural-a (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-natural-b ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-nil (car v))
+           (is-natural-b (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list-natural-a ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-natural-a (car v))
+           (is-list-natural-a (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(define-fun-rec is-list-natural-b ((v Value)) Bool
+  (or (is-nil v)
+      (and (is-cons v)
+           (is-natural-b (car v))
+           (is-list-natural-b (cdr v))))
+  (:measure (size v))
+  (:relation (nat< x y)))
+
+(prove (forall ((v Value))
+  (=> (is-list-natural-a v) (is-list-natural-b v))))

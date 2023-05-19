@@ -1,3 +1,9 @@
+# Setup
+
+Install Racket. Cheesecake has been written in and tested with Racket v8.7.0.6 [cs]
+
+Install Z3 and make sure it is available through the `PATH` environment variable. Cheesecake has been tested with Z3 v4.8.15.
+
 # Usage
 
 ## Translator for Typed Racket Types
@@ -75,15 +81,15 @@ last command took 0 ms
 1 goals ->
 ```
 
-To see if Cheesecake can prove this goal automatically, run `(automatic)`. If it finds a proof, it will print a proof script that leads to a state with no remaining goals. Interested users can read the file `repl.rkt` to see other available tactics.
+To see if Cheesecake can prove this goal automatically, run `(automatic)`. If it finds a proof, it will print a proof script that leads to a state with no remaining goals.
 
 ```
 1 goals -> (automatic)
 [success]
 (induct (is-odd-even in-even v))
-(repl-prove)
-(repl-prove)
-(repl-prove)
+(prove)
+(prove)
+(prove)
 last command took 484 ms
 0 goals ->
 ```
@@ -102,12 +108,12 @@ Another way is to use the optional argument `gas`, which controls how many steps
 1 goals -> (automatic 2)
 [out of gas]
 (induct (is-odd-even in-even v))
-(repl-prove)
+(prove)
 last command took 403 ms
 2 goals -> (automatic 10)
 [success]
-(repl-prove)
-(repl-prove)
+(prove)
+(prove)
 last command took 101 ms
 0 goals ->
 ```
@@ -118,3 +124,17 @@ Once the session is complete (all goals are proved), Cheesecake can be quit by r
 0 goals -> (exit)
 last command took 18 ms
 ```
+
+A command list for users who are interested in trying the prover themselves:
+
+- `(load FILE)` loads a file into the prover
+- `(exit)` quits the prover
+- `(forward)` makes the next goal in the goal list active
+- `(backward)` makes the previous goal in the goal active
+- `(print-goal)` prints the active goal
+- `(automatic [GAS])` applies backtracking search to find a successful proof
+- `(induct EXPRESSION)` inducts according to a well-founded relation derived from a call to a recursive function that is a subexpression of the goal
+- `(eliminate-destructors)` splits the goal so that paths like `(car x)` and `(cdr x)` are replaced with fresh variables
+- `(prove)` uses the backend SMT solver, currently Z3, to prove the current goal non-inductively
+- `(undo)` undoes the most recent successful 
+- `(suggest)` inspects the goal and reports possible function calls to use `(induct _)`  with
